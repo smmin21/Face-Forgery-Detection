@@ -1,0 +1,21 @@
+EXP_NAME: inception_dann_test_alpha_test
+
+DATA:
+  type: image # else image
+  train_data_name: ff
+  train_data_path: /root/datasets/ff
+  test_data_name: all
+  test_data_path: all
+  image_size: 299
+  batch_size: 64
+  crop_ratio: 1
+  num_workers: 4
+  frame_num: 32 # for video
+
+MODEL:
+  name: Inception_dann
+  pretrained: True
+  num_classes: 2
+
+TEST:
+  load_ckpt_dir: /root/code/dann/result/inception_dann_alpha_test_weight/50_epochs_64_batch_0.0001_lr/step3150_ep50.pt

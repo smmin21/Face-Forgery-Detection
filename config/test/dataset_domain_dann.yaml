@@ -1,0 +1,21 @@
+EXP_NAME: dataset_domain_I3D_dann_test_final
+
+DATA:
+  type: video # else image
+  train_data_name: ff
+  train_data_path: /root/datasets/ff
+  test_data_name: all
+  test_data_path: all
+  image_size: 224
+  batch_size: 16
+  crop_ratio: 1
+  num_workers: 4
+  frame_num: 32 # for video
+
+MODEL:
+  name: I3D_dann
+  pretrained: True
+  num_classes: 2
+
+TEST:
+  load_ckpt_dir: /root/code/dann/result/dataset_domain_I3D_dann_final/10_epochs_16_batch_0.0001_lr/step7800_ep8.pt
