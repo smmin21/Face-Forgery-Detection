@@ -1,7 +1,7 @@
-EXP_NAME: inception_baseline_reproduce
+EXP_NAME: inception_baseline
 
 DATA:
-  type: image # else image
+  type: image 
   train_data_name: ff
   train_data_path: /root/datasets/ff
   test_data_name: celeb
@@ -18,7 +18,7 @@ MODEL:
   num_classes: 2
 
 TRAIN:
-  epochs: 30
+  epochs: 50
   lr: 0.0001
   momentum: 0.9
   weight_decay: 0.0001

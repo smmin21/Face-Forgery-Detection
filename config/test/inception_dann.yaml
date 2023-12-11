@@ -1,7 +1,7 @@
-EXP_NAME: inception_dann_test_final
+EXP_NAME: inception_dann_test
 
 DATA:
-  type: image # else image
+  type: image 
   train_data_name: ff
   train_data_path: /root/datasets/ff
   test_data_name: all

@@ -1,7 +1,7 @@
-EXP_NAME: i3d_dann_test_final
+EXP_NAME: i3d_dann_test
 
 DATA:
-  type: video # else image
+  type: video 
   train_data_name: ff
   train_data_path: /root/datasets/ff
   test_data_name: all

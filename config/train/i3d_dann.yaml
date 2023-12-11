@@ -1,4 +1,4 @@
-EXP_NAME: i3d_dann_alpha_test
+EXP_NAME: i3d_dann
 
 DATA:
   type: video # else image
