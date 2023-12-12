@@ -59,7 +59,7 @@ if __name__ == '__main__':
     console_handler.setFormatter(console_logging_format)
     logger.addHandler(console_handler)
     
-    log_save_path = os.path.join('..', 'result', 'log', opt.EXP_NAME)
+    log_save_path = os.path.join('results', 'test_log', opt.EXP_NAME)
     os.makedirs(log_save_path, exist_ok=True)
     file_handler = logging.FileHandler(os.path.join(log_save_path, 'test.log'))
     file_handler.setFormatter(console_logging_format)

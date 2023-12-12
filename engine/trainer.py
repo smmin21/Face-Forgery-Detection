@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import roc_auc_score
 from collections import defaultdict
+from omegaconf import OmegaConf
 
 class Trainer():
     def __init__(self, opt, data_loader, model, logger):
@@ -29,7 +30,7 @@ class Trainer():
         self.total_epoch = opt.TRAIN.epochs
         self.log_interval = opt.TRAIN.log_interval
         self.save_interval = opt.TRAIN.save_interval
-        self.ckpt_dir = os.path.join('..', 'result', opt.EXP_NAME, f'{self.total_epoch}_epochs_{opt.DATA.batch_size}_batch_{opt.TRAIN.lr}_lr')
+        self.ckpt_dir = os.path.join('results', opt.EXP_NAME, f'{self.total_epoch}_epochs_{opt.DATA.batch_size}_batch_{opt.TRAIN.lr}_lr', 'weights')
         self.load_ckpt_dir = opt.TRAIN.load_ckpt_dir
         
         ## load model
@@ -38,12 +39,18 @@ class Trainer():
             print('load model from ', self.load_ckpt_dir)
         else:
             print('no ckpt to load!')
+            
+        ## save
+        os.makedirs(self.ckpt_dir, exist_ok=True)
+        self.logger.info(f"CONFIG: \n{self.opt}")
+        OmegaConf.save(self.opt, os.path.join(self.ckpt_dir, '..', 'config.yaml'))
         
         
     def train(self):  
         ## start train
         total_steps = 0
         err_list = []
+        best_val_auc = 0
         print("Start training,,,")
         print("device: ", self.device)
         
@@ -74,7 +81,10 @@ class Trainer():
             err_list.append(err_sum/for_loop_length)
             total, correct, val_loss, val_auc = self.validate()
             self.logger.info('Epoch: %d/%d, Train loss: %.6f, val loss: %.6f, Accuracy: %.2f, AUC: %.2f' %(epoch+1, self.total_epoch, err_sum/for_loop_length, val_loss, 100*correct/total, val_auc))
-        self.save_model(total_steps, epoch)
+            if val_auc > best_val_auc:
+                best_val_auc = val_auc
+                torch.save(self.model.state_dict(), osp.join(self.ckpt_dir, '..', 'max-va.pt'))
+        torch.save(self.model.state_dict(), osp.join(self.ckpt_dir, '..', 'epoch-last.pt'))
         self.save_train_loss_graph(err_list, 'label')
         self.logger.info('Finished Training : total steps %d' %total_steps)
         
@@ -83,6 +93,7 @@ class Trainer():
         total_steps = 0
         err_label_list = []
         err_domain_list = []
+        best_val_auc = 0
         print("Start training,,, with DANN")
         print("device: ", self.device)
         
@@ -124,7 +135,10 @@ class Trainer():
 
             total, correct, val_loss, val_auc = self.validate()
             self.logger.info('Epoch: %d/%d, Train loss: %.6f, val loss: %.6f, Accuracy: %.2f, AUC: %.2f' %(epoch+1, self.total_epoch, train_loss/for_loop_length, val_loss, 100*correct/total, val_auc))
-        self.save_model(total_steps, epoch)
+            if val_auc > best_val_auc:
+                best_val_auc = val_auc
+                torch.save(self.model.state_dict(), osp.join(self.ckpt_dir, '..', 'max-va.pt'))
+        torch.save(self.model.state_dict(), osp.join(self.ckpt_dir, '..', 'epoch-last.pt'))
         self.save_train_loss_graph(err_label_list, 'label')
         self.save_train_loss_graph(err_domain_list, 'domain')
         self.logger.info('Finished DANN Training : total steps %d' %total_steps)
@@ -220,7 +234,6 @@ class Trainer():
         self.model.load_state_dict(torch.load(self.load_ckpt_dir))
             
     def save_model(self, steps, epoch):
-        os.makedirs(self.ckpt_dir, exist_ok=True)
         torch.save(self.model.state_dict(), osp.join(self.ckpt_dir, f'step{steps}_ep{epoch+1}.pt'))
 
     def save_train_loss_graph(self, train_loss_list, type):   
@@ -231,5 +244,5 @@ class Trainer():
         plt.plot(epochs, train_loss_list, label='Train Loss')
         plt.xlabel('epoch')
         plt.ylabel('train loss')
-        plt.savefig(osp.join(self.ckpt_dir, 'train_{}_loss.png'.format(type)))
+        plt.savefig(osp.join(self.ckpt_dir, '..', 'train_{}_loss.png'.format(type)))
         plt.close()

@@ -66,6 +66,12 @@ if __name__ == '__main__':
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(console_logging_format)
     logger.addHandler(console_handler)
+    
+    log_save_path = os.path.join('results', opt.EXP_NAME, f'{opt.TRAIN.epochs}_epochs_{opt.DATA.batch_size}_batch_{opt.TRAIN.lr}_lr')
+    os.makedirs(log_save_path, exist_ok=False)
+    file_handler = logging.FileHandler(os.path.join(log_save_path, 'train.log'))
+    file_handler.setFormatter(console_logging_format)
+    logger.addHandler(file_handler)
 
     # BANMo System    
     trainer = Trainer(opt, dataloader, model, logger)
